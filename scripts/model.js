@@ -12,13 +12,16 @@ export default class Model {
         this.visited = new Set();
         this.steps = [];
         this.finished = false;
+        this.endNode = null;
     }
 
-    runDijkstra(start) {
+    runDijkstra(start, end) {
         this.resetState();
+        this.endNode = end;
+        
         const pq = new PriorityQueue();
 
-        // init distances
+        // init
         this.graph.nodes.forEach(n => {
             this.dist[n.id] = Infinity;
             this.prev[n.id] = null;
@@ -35,21 +38,28 @@ export default class Model {
 
         while (!pq.isEmpty()) {
             const { node: u } = pq.extractMin();
-
             if (this.visited.has(u)) continue;
 
             this.visited.add(u);
 
-            const neighbors = this.graph.getNeighbors(u);
+            // EARLY STOP: once we reach the target, we can stop
+            if (u === end) {
+                this.steps.push({
+                    type: "target_reached",
+                    u,
+                    dist: { ...this.dist },
+                    prev: { ...this.prev }
+                });
+                break;
+            }
 
-            for (const { id: v, weight } of neighbors) {
-                let alt = this.dist[u] + weight;
-
+            for (const { id: v, weight } of this.graph.getNeighbors(u)) {
+                const alt = this.dist[u] + weight;
                 if (alt < this.dist[v]) {
                     this.dist[v] = alt;
                     this.prev[v] = u;
                     pq.decreaseKey(v, alt);
-                    pq.insert(v, alt); // insert if not present
+                    pq.insert(v, alt);
                 }
 
                 this.steps.push({
@@ -70,6 +80,23 @@ export default class Model {
             });
         }
 
-        this.steps.push({ type: "done", dist: this.dist, prev: this.prev });
+        this.steps.push({
+            type: "done",
+            dist: this.dist,
+            prev: this.prev
+        });
+    }
+
+    /** Build the final path by backtracking prev[] */
+    reconstructPath() {
+        const path = [];
+        let curr = this.endNode;
+
+        while (curr !== null) {
+            path.push(curr);
+            curr = this.prev[curr];
+        }
+
+        return path.reverse();
     }
 }

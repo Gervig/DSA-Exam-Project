@@ -103,7 +103,16 @@ button:hover {
     fill: #fbbf24;
 }
 
-.edge.highlight {
-    stroke: red !important;
-    stroke-width: 4px;
+/* Default edge numbers */
+.edge-label {
+    fill: black;
+    font-weight: bold;
+    pointer-events: none; /* ignore mouse events */
 }
+
+/* Edge numbers along shortest path */
+.edge-label.highlight {
+    fill: #ef4444; /* red */
+    font-weight: bold;
+}
+

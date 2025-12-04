@@ -21,8 +21,7 @@ export default class View {
                       stroke="black" stroke-width="2"></line>
                 <text x="${(n1.x+n2.x)/2}"
                       y="${(n1.y+n2.y)/2}"
-                      font-size="14"
-                      fill="black">${e.weight}</text>
+                      font-size="14">${e.weight}</text>
             `;
         });
 
@@ -33,9 +32,8 @@ export default class View {
                         id="node-${n.id}"
                         cx="${n.x}" cy="${n.y}" r="20"
                         fill="white" stroke="black" stroke-width="2"></circle>
-                <text x="${n.x}" y="${n.y+5}"
-                      text-anchor="middle"
-                      font-size="14">${n.id}</text>
+                <text x="${n.x}" y="${n.y+5}" font-size="14"
+                      text-anchor="middle">${n.id}</text>
             `;
         });
     }
@@ -69,5 +67,24 @@ export default class View {
     markActive(id) {
         document.querySelectorAll(".node").forEach(n => n.classList.remove("active"));
         document.getElementById(`node-${id}`).classList.add("active");
+    }
+
+    /** Highlight final path */
+    highlightFinalPath(path) {
+        // highlight nodes
+        path.forEach(id => {
+            const node = document.getElementById(`node-${id}`);
+            node.style.fill = "#86efac"; // green
+        });
+
+        // highlight edges
+        for (let i = 0; i < path.length - 1; i++) {
+            const a = path[i];
+            const b = path[i + 1];
+            const e = document.getElementById(`edge-${a}-${b}`);
+            if (e) {
+                e.classList.add("highlight");
+            }
+        }
     }
 }
