@@ -1,5 +1,5 @@
 import {graph} from "../data structures/graph.js"
-import {queue} from "../data structures/queue.js"
+import queue from "../data structures/queue.js"
 
 let steps = [];
 
