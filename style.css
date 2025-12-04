@@ -1,0 +1,25 @@
+.node {
+  transition: 0.3s;
+}
+
+.edge {
+  stroke: #444;
+  stroke-width: 2;
+}
+
+.visited {
+  fill: lightgreen;
+}
+
+.current {
+  fill: yellow;
+}
+
+.queue {
+  fill: orange;
+}
+
+.path {
+  stroke: blue;
+  stroke-width: 3;
+}
