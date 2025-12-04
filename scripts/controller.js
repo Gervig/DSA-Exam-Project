@@ -6,47 +6,88 @@ const graph = new Graph();
 const view = new View();
 const model = new Model(graph);
 
-// Sample graph
-graph.addNode("A", 100, 100);
-graph.addNode("B", 300, 80);
-graph.addNode("C", 450, 200);
-graph.addNode("D", 250, 300);
-graph.addNode("E", 100, 250);
+// ----- Build sample graph -----
 
+graph.addNode("A", 120, 80);
+graph.addNode("B", 300, 60);
+graph.addNode("C", 480, 120);
+graph.addNode("D", 520, 280);
+graph.addNode("E", 350, 330);
+graph.addNode("F", 160, 300);
+graph.addNode("G", 80, 200);
+graph.addNode("H", 260, 180);
+
+// Weighted edges
 graph.addEdge("A", "B", 2);
-graph.addEdge("A", "D", 5);
+graph.addEdge("A", "G", 3);
+graph.addEdge("A", "H", 7);
+
 graph.addEdge("B", "C", 4);
-graph.addEdge("C", "D", 1);
-graph.addEdge("D", "E", 3);
+graph.addEdge("B", "H", 1);
+
+graph.addEdge("C", "D", 5);
+graph.addEdge("C", "H", 2);
+
+graph.addEdge("D", "E", 1);
+
+graph.addEdge("E", "F", 6);
+
+graph.addEdge("F", "G", 4);
+
+graph.addEdge("H", "E", 3); // nice shortcut
+graph.addEdge("H", "F", 5);
+
+
 
 view.renderGraph(graph);
+
+// ----- Populate dropdowns -----
+const startSelect = document.getElementById("start-node");
+const endSelect = document.getElementById("end-node");
+
+graph.nodes.forEach(n => {
+    startSelect.innerHTML += `<option>${n.id}</option>`;
+    endSelect.innerHTML += `<option>${n.id}</option>`;
+});
+
+startSelect.value = "A";
+endSelect.value = "E";
 
 let stepIndex = 0;
 let autoPlay = null;
 
-// Run full Dijkstra
+// ----- Buttons -----
+
 document.getElementById("btn-run").onclick = () => {
-    model.runDijkstra("A");
+    model.runDijkstra(startSelect.value, endSelect.value);
     stepIndex = 0;
     playSteps();
 };
 
-// Next Step manually
 document.getElementById("btn-step").onclick = () => {
-    if (model.steps.length === 0) model.runDijkstra("A");
+    if (model.steps.length === 0)
+        model.runDijkstra(startSelect.value, endSelect.value);
+
     showStep(stepIndex++);
 };
 
-// Reset
 document.getElementById("btn-reset").onclick = () => {
-    stepIndex = 0;
+    clearInterval(autoPlay);
     model.resetState();
     view.renderGraph(graph);
     view.log.innerHTML = "";
-    clearInterval(autoPlay);
+    stepIndex = 0;
 };
 
-// Auto-play handler
+// Show final path
+document.getElementById("btn-show-path").onclick = () => {
+    const path = model.reconstructPath();
+    view.highlightFinalPath(path);
+    view.logStep(`Final path: ${path.join(" → ")}`);
+};
+
+// ----- Step handling -----
+
 function playSteps() {
     clearInterval(autoPlay);
     const delay = document.getElementById("speed").value;
@@ -60,33 +101,39 @@ function playSteps() {
     }, delay);
 }
 
-// Interpret a step object
 function showStep(step) {
     const s = model.steps[step];
-
     if (!s) return;
 
     view.updatePQ(s.pq);
 
-    if (s.type === "init") {
-        view.logStep("Initialized distances.");
-        view.highlightPseudo(0);
-    }
+    switch (s.type) {
+        case "init":
+            view.logStep("Initialized distances.");
+            view.highlightPseudo(0);
+            break;
 
-    if (s.type === "relax") {
-        view.markActive(s.u);
-        view.logStep(`Relaxing edge ${s.u} -> ${s.v}`);
-        view.highlightPseudo(5);
-    }
+        case "relax":
+            view.markActive(s.u);
+            view.logStep(`Relaxing edge ${s.u} → ${s.v}`);
+            view.highlightPseudo(5);
+            break;
 
-    if (s.type === "visit") {
-        view.markVisited(s.u);
-        view.logStep(`${s.u} permanently visited.`);
-        view.highlightPseudo(10);
-    }
+        case "visit":
+            view.markVisited(s.u);
+            view.logStep(`${s.u} permanently visited.`);
+            view.highlightPseudo(10);
+            break;
 
-    if (s.type === "done") {
-        view.logStep("Algorithm finished.");
-        view.highlightPseudo(14);
+        case "target_reached":
+            view.markVisited(s.u);
+            view.logStep(`Target node ${s.u} reached! Stopping early.`);
+            view.highlightPseudo(8);
+            break;
+
+        case "done":
+            view.logStep("Algorithm finished.");
+            view.highlightPseudo(14);
+            break;
     }
 }

@@ -61,17 +61,27 @@ function dijkstra(start):
   </main>
 
   <!-- ===== Controls ===== -->
-  <footer id="controls">
+<footer id="controls">
+    <label>
+        Start:
+        <select id="start-node"></select>
+    </label>
+
+    <label>
+        End:
+        <select id="end-node"></select>
+    </label>
+
     <button id="btn-run">Run</button>
     <button id="btn-step">Next Step</button>
     <button id="btn-reset">Reset</button>
-    <!-- <button id="btn-random">Random Graph</button> -->
+    <button id="btn-show-path">Show Final Path</button>
 
     <label>
       Speed:
       <input type="range" id="speed" min="50" max="2000" value="600">
     </label>
-  </footer>
+</footer>
 
   <!-- ===== Scripts ===== -->
   <!-- Data structures -->
