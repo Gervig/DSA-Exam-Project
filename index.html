@@ -1,21 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DSA Exam Project</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>Dijkstra Visualization</h1>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dijkstra Visualizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
-    <div id="controls">
-      <button id="start">Start Dijkstra</button>
-      <button id="next">Next Step</button>
-    </div>
+<body>
 
-    <svg id="graph" width="800" height="500"></svg>
+  <header>
+    <h1>Dijkstra's Shortest Path Visualizer</h1>
+  </header>
 
-    <script type="module" src="./scripts/controller.js"></script>
-  </body>
+  <main>
+
+    <!-- ===== Graph area ===== -->
+    <section id="graph-section">
+      <svg id="graph" width="800" height="500"></svg>
+    </section>
+
+    <!-- ===== Right-column panels ===== -->
+    <section id="side-panel">
+
+      <!-- Pseudo-code output -->
+      <div class="panel" id="pseudocode-panel">
+        <h2>Pseudo-code</h2>
+        <pre id="pseudocode">
+function dijkstra(start):
+    create distance[] ← ∞
+    distance[start] ← 0
+    PQ.insert(start, 0)
+
+    while PQ is not empty:
+        u ← PQ.extractMin()
+        for each neighbor v of u:
+            alt ← distance[u] + weight(u, v)
+            if alt < distance[v]:
+                distance[v] ← alt
+                PQ.decreaseKey(v, alt)
+        mark u as visited
+        record step
+        </pre>
+      </div>
+
+      <!-- Priority Queue visual -->
+      <div class="panel" id="pq-panel">
+        <h2>Priority Queue</h2>
+        <ul id="pq-list"></ul>
+      </div>
+
+      <!-- Step-by-step log -->
+      <div class="panel" id="log-panel">
+        <h2>Steps</h2>
+        <div id="log"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===== Controls ===== -->
+  <footer id="controls">
+    <button id="btn-run">Run</button>
+    <button id="btn-step">Next Step</button>
+    <button id="btn-reset">Reset</button>
+    <!-- <button id="btn-random">Random Graph</button> -->
+
+    <label>
+      Speed:
+      <input type="range" id="speed" min="50" max="2000" value="600">
+    </label>
+  </footer>
+
+  <!-- ===== Scripts ===== -->
+  <!-- Data structures -->
+  <script type="module" src="data-structures/priorityQueue.js"></script>
+  <script type="module" src="data-structures/graph.js"></script>
+
+  <!-- MVC modules -->
+  <script type="module" src="scripts/model.js"></script>
+  <script type="module" src="scripts/view.js"></script>
+  <script type="module" src="scripts/controller.js"></script>
+
+</body>
 </html>

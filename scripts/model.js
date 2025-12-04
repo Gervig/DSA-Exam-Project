@@ -1,45 +1,75 @@
-function drawGraph() {
-  const svg = document.getElementById("graph");
-  svg.innerHTML = "";
+import PriorityQueue from "../data-structures/priorityQueue.js";
 
-  // Draw edges
-  graph.edges.forEach(e => {
-    const n1 = graph.nodes.find(n => n.id === e.from);
-    const n2 = graph.nodes.find(n => n.id === e.to);
+export default class Model {
+    constructor(graph) {
+        this.graph = graph;
+        this.resetState();
+    }
 
-    svg.innerHTML += `
-      <line 
-        class="edge" 
-        id="edge-${e.from}-${e.to}"
-        x1="${n1.x}" y1="${n1.y}"
-        x2="${n2.x}" y2="${n2.y}"
-      ></line>
+    resetState() {
+        this.dist = {};
+        this.prev = {};
+        this.visited = new Set();
+        this.steps = [];
+        this.finished = false;
+    }
 
-      <text 
-        x="${(n1.x + n2.x) / 2}" 
-        y="${(n1.y + n2.y) / 2}" 
-        font-size="14"
-      >${e.weight}</text>
-    `;
-  });
+    runDijkstra(start) {
+        this.resetState();
+        const pq = new PriorityQueue();
 
-  // Draw nodes
-  graph.nodes.forEach(n => {
-    svg.innerHTML += `
-      <circle 
-        class="node"
-        id="node-${n.id}"
-        cx="${n.x}" cy="${n.y}" r="20" 
-        stroke="black" stroke-width="2" fill="white"
-      ></circle>
-      <text 
-        x="${n.x}" 
-        y="${n.y + 5}" 
-        text-anchor="middle"
-        font-size="14"
-      >${n.id}</text>
-    `;
-  });
+        // init distances
+        this.graph.nodes.forEach(n => {
+            this.dist[n.id] = Infinity;
+            this.prev[n.id] = null;
+        });
+
+        this.dist[start] = 0;
+        pq.insert(start, 0);
+
+        this.steps.push({
+            type: "init",
+            dist: { ...this.dist },
+            pq: [...pq.heap]
+        });
+
+        while (!pq.isEmpty()) {
+            const { node: u } = pq.extractMin();
+
+            if (this.visited.has(u)) continue;
+
+            this.visited.add(u);
+
+            const neighbors = this.graph.getNeighbors(u);
+
+            for (const { id: v, weight } of neighbors) {
+                let alt = this.dist[u] + weight;
+
+                if (alt < this.dist[v]) {
+                    this.dist[v] = alt;
+                    this.prev[v] = u;
+                    pq.decreaseKey(v, alt);
+                    pq.insert(v, alt); // insert if not present
+                }
+
+                this.steps.push({
+                    type: "relax",
+                    u, v,
+                    dist: { ...this.dist },
+                    prev: { ...this.prev },
+                    pq: [...pq.heap]
+                });
+            }
+
+            this.steps.push({
+                type: "visit",
+                u,
+                visited: new Set(this.visited),
+                dist: { ...this.dist },
+                pq: [...pq.heap]
+            });
+        }
+
+        this.steps.push({ type: "done", dist: this.dist, prev: this.prev });
+    }
 }
-
-drawGraph();

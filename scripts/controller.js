@@ -1,77 +1,92 @@
-import {graph} from "../data structures/graph.js"
-import queue from "../data structures/queue.js"
+import Graph from "../data-structures/graph.js";
+import Model from "./model.js";
+import View from "./view.js";
 
-let steps = [];
+const graph = new Graph();
+const view = new View();
+const model = new Model(graph);
 
-function applyStep(step) {
-  // reset node colors
-  graph.nodes.forEach(n => {
-    document.getElementById(`node-${n.id}`).setAttribute("class", "node");
-  });
+// Sample graph
+graph.addNode("A", 100, 100);
+graph.addNode("B", 300, 80);
+graph.addNode("C", 450, 200);
+graph.addNode("D", 250, 300);
+graph.addNode("E", 100, 250);
 
-  // color visited
-  step.visited.forEach(id => {
-    document.getElementById(`node-${id}`).classList.add("visited");
-  });
+graph.addEdge("A", "B", 2);
+graph.addEdge("A", "D", 5);
+graph.addEdge("B", "C", 4);
+graph.addEdge("C", "D", 1);
+graph.addEdge("D", "E", 3);
 
-  // color priority queue
-  step.queue.forEach(id => {
-    document.getElementById(`node-${id}`).classList.add("queue");
-  });
+view.renderGraph(graph);
 
-  // highlight current node
-  document.getElementById(`node-${step.current}`).classList.add("current");
+let stepIndex = 0;
+let autoPlay = null;
 
-  // highlight final path (if any)
-  step.path.forEach(p => {
-    const id = `edge-${p.from}-${p.to}`;
-    document.getElementById(id).classList.add("path");
-  });
+// Run full Dijkstra
+document.getElementById("btn-run").onclick = () => {
+    model.runDijkstra("A");
+    stepIndex = 0;
+    playSteps();
+};
+
+// Next Step manually
+document.getElementById("btn-step").onclick = () => {
+    if (model.steps.length === 0) model.runDijkstra("A");
+    showStep(stepIndex++);
+};
+
+// Reset
+document.getElementById("btn-reset").onclick = () => {
+    stepIndex = 0;
+    model.resetState();
+    view.renderGraph(graph);
+    view.log.innerHTML = "";
+    clearInterval(autoPlay);
+};
+
+// Auto-play handler
+function playSteps() {
+    clearInterval(autoPlay);
+    const delay = document.getElementById("speed").value;
+
+    autoPlay = setInterval(() => {
+        if (stepIndex >= model.steps.length) {
+            clearInterval(autoPlay);
+            return;
+        }
+        showStep(stepIndex++);
+    }, delay);
 }
 
-function drawGraph() {
-  const svg = document.getElementById("graph");
-  svg.innerHTML = "";
+// Interpret a step object
+function showStep(step) {
+    const s = model.steps[step];
 
-  // Draw edges
-  graph.edges.forEach(e => {
-    const n1 = graph.nodes.find(n => n.id === e.from);
-    const n2 = graph.nodes.find(n => n.id === e.to);
+    if (!s) return;
 
-    svg.innerHTML += `
-      <line 
-        class="edge" 
-        id="edge-${e.from}-${e.to}"
-        x1="${n1.x}" y1="${n1.y}"
-        x2="${n2.x}" y2="${n2.y}"
-      ></line>
+    view.updatePQ(s.pq);
 
-      <text 
-        x="${(n1.x + n2.x) / 2}" 
-        y="${(n1.y + n2.y) / 2}" 
-        font-size="14"
-      >${e.weight}</text>
-    `;
-  });
+    if (s.type === "init") {
+        view.logStep("Initialized distances.");
+        view.highlightPseudo(0);
+    }
 
-  // Draw nodes
-  graph.nodes.forEach(n => {
-    svg.innerHTML += `
-      <circle 
-        class="node"
-        id="node-${n.id}"
-        cx="${n.x}" cy="${n.y}" r="20" 
-        stroke="black" stroke-width="2" fill="white"
-      ></circle>
-      <text 
-        x="${n.x}" 
-        y="${n.y + 5}" 
-        text-anchor="middle"
-        font-size="14"
-      >${n.id}</text>
-    `;
-  });
+    if (s.type === "relax") {
+        view.markActive(s.u);
+        view.logStep(`Relaxing edge ${s.u} -> ${s.v}`);
+        view.highlightPseudo(5);
+    }
+
+    if (s.type === "visit") {
+        view.markVisited(s.u);
+        view.logStep(`${s.u} permanently visited.`);
+        view.highlightPseudo(10);
+    }
+
+    if (s.type === "done") {
+        view.logStep("Algorithm finished.");
+        view.highlightPseudo(14);
+    }
 }
-
-drawGraph();
-
