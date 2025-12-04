@@ -20,8 +20,8 @@ export default class View {
                       x2="${n2.x}" y2="${n2.y}"
                       stroke="black" stroke-width="2"></line>
                 <text x="${(n1.x+n2.x)/2}"
-                      y="${(n1.y+n2.y)/2}"
-                      font-size="14">${e.weight}</text>
+                    y="${(n1.y+n2.y)/2}"
+                    class="edge-label">${e.weight}</text>
             `;
         });
 
