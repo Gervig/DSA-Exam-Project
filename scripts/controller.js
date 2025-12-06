@@ -6,7 +6,7 @@ const graph = new Graph();
 const view = new View();
 const model = new Model(graph);
 
-// ----- Build sample graph -----
+// ----- Build sample graph ----- //
 
 graph.addNode("A", 120, 80);
 graph.addNode("B", 300, 60);
@@ -17,7 +17,7 @@ graph.addNode("F", 160, 300);
 graph.addNode("G", 80, 200);
 graph.addNode("H", 260, 180);
 
-// Weighted edges
+// weighted edges
 graph.addEdge("A", "B", 2);
 graph.addEdge("A", "G", 3);
 graph.addEdge("A", "H", 7);
@@ -34,14 +34,14 @@ graph.addEdge("E", "F", 6);
 
 graph.addEdge("F", "G", 4);
 
-graph.addEdge("H", "E", 3); // nice shortcut
+graph.addEdge("H", "E", 3);
 graph.addEdge("H", "F", 5);
 
 
 
 view.renderGraph(graph);
 
-// ----- Populate dropdowns -----
+// ----- Populate dropdowns ----- //
 const startSelect = document.getElementById("start-node");
 const endSelect = document.getElementById("end-node");
 
@@ -56,7 +56,7 @@ endSelect.value = "E";
 let stepIndex = 0;
 let autoPlay = null;
 
-// ----- Buttons -----
+// ----- Buttons ----- //
 
 document.getElementById("btn-run").onclick = () => {
     model.runDijkstra(startSelect.value, endSelect.value);
@@ -79,14 +79,14 @@ document.getElementById("btn-reset").onclick = () => {
     stepIndex = 0;
 };
 
-// Show final path
+// highlight final path
 document.getElementById("btn-show-path").onclick = () => {
     const path = model.reconstructPath();
     view.highlightFinalPath(path);
     view.logStep(`Final path: ${path.join(" → ")}`);
 };
 
-// ----- Step handling -----
+// ----- Step handling ----- //
 
 function playSteps() {
     clearInterval(autoPlay);

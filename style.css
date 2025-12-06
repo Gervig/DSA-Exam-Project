@@ -69,13 +69,21 @@ main {
 
 /* Controls */
 footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
   padding: 10px;
   background: #e5e7eb;
   display: flex;
   justify-content: center;
   gap: 15px;
   border-top: 2px solid #ccc;
+  
+  z-index: 10;
 }
+
 
 button {
   padding: 8px 15px;
