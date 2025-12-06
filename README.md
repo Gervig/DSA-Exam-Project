@@ -18,7 +18,7 @@ https://gervig.github.io/DSA-Exam-Project/
 ## Algorithms and data structures
 
 ### Algorithm
-The algorithm used for this project is Dijkstra's algorithm for finding the shortest path from a start node to an end node in a graph.
+The algorithm used for this project is **Dijkstra's algorithm** for finding the shortest path from a start node to an end node in a graph.
 
 ### Data structures
 
@@ -37,8 +37,8 @@ For tracking shortest known distances and the previously visited node (the path)
 ## Running it locally
 To run the application locally follow these steps: 
 
-1) Clone the repository to your device from Github
-2) Open the project in Visual Studio Code
-3) Download the Live Server extension for Visual Code
-4) In the bottom right corner of Visual Studio code, click "Go Live"
-5) Your default browser will now open a locally hosted version of the application
+1) Clone the repository to your device from Github.
+2) Open the project in Visual Studio Code.
+3) Download the Live Server extension for Visual Code.
+4) In the bottom right corner of Visual Studio code, click "Go Live".
+5) Your default browser will now open a locally hosted version of the application.
