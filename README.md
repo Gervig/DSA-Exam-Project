@@ -31,7 +31,7 @@ Dijkstra's algorithm has a priority queue for selecting the next closest node, f
 #### Set
 For tracking which nodes have been visited a set was used.
 
-## Tables
+#### Tables
 For tracking shortest known distances and the previously visited node (the path), tables were used for this purpose.
 
 ## Running it locally
