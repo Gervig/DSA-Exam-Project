@@ -15,12 +15,13 @@ export default class Model {
         this.endNode = null;
     }
 
+    // Dijkstra's algorithm, with visualization steps
     runDijkstra(start, end) {
-        this.resetState();
-        this.endNode = end;
+        this.resetState(); // clear any previous data
+        this.endNode = end; // set new end node
         
 
-        const pq = new PriorityQueue();
+        const pq = new PriorityQueue(); // initialize new min heap, priority queue
 
         // initialize
         this.graph.nodes.forEach(n => {
@@ -38,16 +39,17 @@ export default class Model {
             pq: [...pq.heap] // store min-heap (priority queue) in an array
         });
 
+        // main loop, ends when there are no nodes left to explore
         while (!pq.isEmpty()) {
-            const { node: u } = pq.extractMin();
-            if (this.visited.has(u)) continue;
+            const { node: u } = pq.extractMin(); // extract next node to explore
+            if (this.visited.has(u)) continue; // skip if it has been visited
 
-            this.visited.add(u);
+            this.visited.add(u); // mark node as visited
 
             // once the target has been reached, we can stop
             if (u === end) {
                 this.steps.push({
-                    type: "target_reached", // 
+                    type: "target_reached", // event type for the UI
                     u,
                     dist: { ...this.dist },
                     prev: { ...this.prev }
@@ -55,6 +57,7 @@ export default class Model {
                 break;
             }
 
+            // relax all neighbours of u node
             for (const { id: v, weight } of this.graph.getNeighbors(u)) {
                 const alt = this.dist[u] + weight;
                 if (alt < this.dist[v]) {
