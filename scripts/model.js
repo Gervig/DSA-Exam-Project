@@ -19,21 +19,23 @@ export default class Model {
         this.resetState();
         this.endNode = end;
         
+
         const pq = new PriorityQueue();
 
-        // init
+        // initialize
         this.graph.nodes.forEach(n => {
-            this.dist[n.id] = Infinity;
+            this.dist[n.id] = Infinity; // set distances to infinity at the beginning
             this.prev[n.id] = null;
         });
 
-        this.dist[start] = 0;
+        this.dist[start] = 0; // the distance to the start is always 0, we begin here
         pq.insert(start, 0);
 
+        // visualization step of the algorithm for the UI
         this.steps.push({
-            type: "init",
-            dist: { ...this.dist },
-            pq: [...pq.heap]
+            type: "init", // initial setup for psuedocode highlight
+            dist: { ...this.dist }, // copies initial distances
+            pq: [...pq.heap] // store min-heap (priority queue) in an array
         });
 
         while (!pq.isEmpty()) {
@@ -42,10 +44,10 @@ export default class Model {
 
             this.visited.add(u);
 
-            // EARLY STOP: once we reach the target, we can stop
+            // once the target has been reached, we can stop
             if (u === end) {
                 this.steps.push({
-                    type: "target_reached",
+                    type: "target_reached", // 
                     u,
                     dist: { ...this.dist },
                     prev: { ...this.prev }
